@@ -23,7 +23,7 @@ impl User {
     }
 
     pub fn user_id(&self) -> &String {
-        &self.user_id.value
+        &self.user_id.value()
     }
 
     pub fn bio(&self) -> &Option<String> {
@@ -62,8 +62,14 @@ pub struct UserId {
 }
 
 impl UserId {
-    pub fn new(value: String) -> Self {
-        Self { value }
+    pub fn value(&self) -> &String {
+        &self.value
+    }
+}
+
+impl From<String> for UserId {
+    fn from(value: String) -> Self {
+        UserId { value }
     }
 }
 
@@ -105,7 +111,7 @@ mod tests {
             // Correct
             let result = UserBuilder::default()
                 .name("taro".to_string())
-                .user_id(UserId::new("taro0123".to_string()))
+                .user_id(UserId::from("taro0123".to_string()))
                 .bio(Some("Hello!".to_string()))
                 .follower(10)
                 .followee(20)
@@ -122,7 +128,7 @@ mod tests {
             // Correct
             let result = UserBuilder::default()
                 .name("taro".to_string())
-                .user_id(UserId::new("taro0123".to_string()))
+                .user_id(UserId::from("taro0123".to_string()))
                 .build();
             assert_eq!(result.is_ok(), true);
             let user = result.unwrap();
@@ -136,7 +142,7 @@ mod tests {
             // Incorrect because user id is invalid.
             let result = UserBuilder::default()
                 .name("taro".to_string())
-                .user_id(UserId::new("taro0123-".to_string()))
+                .user_id(UserId::from("taro0123-".to_string()))
                 .build();
             assert_eq!(result.is_err(), true);
         }
