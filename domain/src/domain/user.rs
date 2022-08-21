@@ -106,25 +106,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn user_id_test() {
-        {
-            // Correct
-            let user_id = UserId::try_from("adf130_".to_string());
-            assert!(user_id.is_ok());
-        }
-        {
-            // Incorrect because value is less than 5 characters.
-            let user_id = UserId::try_from("adf1".to_string());
-            assert!(user_id.is_err());
-        }
-        {
-            // Incorrect because value has the characters out WORD.
-            let user_id = UserId::try_from("adf130_-*".to_string());
-            assert!(user_id.is_err());
-        }
-    }
-
-    #[test]
     fn user_test() {
         {
             // Correct
