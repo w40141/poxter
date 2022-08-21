@@ -22,7 +22,7 @@ pub struct UserBuilder {
 
 impl User {
     pub fn user_id(&self) -> &String {
-        &self.user_id.value()
+        self.user_id.value()
     }
 
     pub fn name(&self) -> &String {
@@ -54,17 +54,17 @@ impl User {
 
 impl UserBuilder {
     pub fn user_id(&mut self, v: UserId) -> Self {
-        self.user_id = Some(v.clone());
+        self.user_id = Some(v);
         self.clone()
     }
 
     pub fn name(&mut self, v: String) -> Self {
-        self.name = Some(v.clone());
+        self.name = Some(v);
         self.clone()
     }
 
     pub fn bio(&mut self, v: String) -> Self {
-        self.bio = Some(v.clone());
+        self.bio = Some(v);
         self.clone()
     }
 
