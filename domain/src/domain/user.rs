@@ -11,15 +11,6 @@ pub struct User {
     followee: i64,
 }
 
-#[derive(Debug, Clone)]
-pub struct UserBuilder {
-    user_id: Option<UserId>,
-    name: Option<String>,
-    bio: Option<String>,
-    follower: i64,
-    followee: i64,
-}
-
 impl User {
     pub fn user_id(&self) -> &String {
         self.user_id.value()
@@ -40,9 +31,19 @@ impl User {
     pub fn followee(&self) -> &i64 {
         &self.followee
     }
+}
 
-    pub fn builder() -> UserBuilder {
-        UserBuilder {
+pub struct UserBuilder {
+    user_id: Option<UserId>,
+    name: Option<String>,
+    bio: Option<String>,
+    follower: i64,
+    followee: i64,
+}
+
+impl UserBuilder {
+    pub fn default() -> Self {
+        Self {
             user_id: None,
             name: None,
             bio: None,
@@ -50,32 +51,29 @@ impl User {
             followee: 0,
         }
     }
-}
-
-impl UserBuilder {
-    pub fn user_id(&mut self, v: UserId) -> Self {
+    pub fn user_id(mut self, v: UserId) -> Self {
         self.user_id = Some(v);
-        self.clone()
+        self
     }
 
-    pub fn name(&mut self, v: String) -> Self {
+    pub fn name(mut self, v: String) -> Self {
         self.name = Some(v);
-        self.clone()
+        self
     }
 
-    pub fn bio(&mut self, v: String) -> Self {
+    pub fn bio(mut self, v: String) -> Self {
         self.bio = Some(v);
-        self.clone()
+        self
     }
 
-    pub fn follower(&mut self, v: i64) -> Self {
+    pub fn follower(mut self, v: i64) -> Self {
         self.follower = v;
-        self.clone()
+        self
     }
 
-    pub fn followee(&mut self, v: i64) -> Self {
+    pub fn followee(mut self, v: i64) -> Self {
         self.followee = v;
-        self.clone()
+        self
     }
 
     pub fn build(&self) -> Result<User> {
@@ -109,7 +107,7 @@ mod tests {
     fn user_test() {
         {
             // Correct
-            let result = User::builder()
+            let result = UserBuilder::default()
                 .name("taro".to_string())
                 .user_id(UserId::try_from("taro0123".to_string()).unwrap())
                 .bio("Hello!".to_string())
@@ -126,7 +124,7 @@ mod tests {
         }
         {
             // Correct
-            let result = User::builder()
+            let result = UserBuilder::default()
                 .name("taro".to_string())
                 .user_id(UserId::try_from("taro0123".to_string()).unwrap())
                 .build();
@@ -140,7 +138,7 @@ mod tests {
         }
         {
             // Incorrect because user id is invalid.
-            let result = User::builder().name("taro".to_string()).build();
+            let result = UserBuilder::default().name("taro".to_string()).build();
             assert!(result.is_err());
         }
     }
