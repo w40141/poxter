@@ -13,7 +13,7 @@ pub struct User {
 
 impl User {
     pub fn user_id(&self) -> &String {
-        self.user_id.value()
+        self.user_id.get()
     }
 
     pub fn name(&self) -> &String {
@@ -116,11 +116,11 @@ mod tests {
                 .build();
             assert!(result.is_ok());
             let user = result.unwrap();
-            assert_eq!(user.name, "taro");
-            assert_eq!(user.user_id.value(), &"taro0123");
-            assert_eq!(user.bio, Some("Hello!".to_string()));
-            assert_eq!(user.follower, 10);
-            assert_eq!(user.followee, 20);
+            assert_eq!(user.name(), "taro");
+            assert_eq!(user.user_id(), &"taro0123");
+            assert_eq!(user.bio(), &Some("Hello!".to_string()));
+            assert_eq!(user.follower(), &10);
+            assert_eq!(user.followee(), &20);
         }
         {
             // Correct
@@ -130,11 +130,11 @@ mod tests {
                 .build();
             assert!(result.is_ok());
             let user = result.unwrap();
-            assert_eq!(user.name, "taro");
-            assert_eq!(user.user_id.value(), &"taro0123");
-            assert_eq!(user.bio, None);
-            assert_eq!(user.follower, 0);
-            assert_eq!(user.followee, 0);
+            assert_eq!(user.name(), "taro");
+            assert_eq!(user.user_id(), &"taro0123");
+            assert_eq!(user.bio(), &None);
+            assert_eq!(user.follower(), &0);
+            assert_eq!(user.followee(), &0);
         }
         {
             // Incorrect because user id is invalid.

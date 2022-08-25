@@ -4,14 +4,12 @@ use regex::Regex;
 use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Debug, Clone)]
-pub struct UserId {
-    // min: 6, max: 20 word: [0-9A-Za-z_]
-    value: String,
-}
+// min: 6, max: 20 word: [0-9A-Za-z_]
+pub struct UserId(String);
 
 impl UserId {
-    pub fn value(&self) -> &String {
-        &self.value
+    pub fn get(&self) -> &String {
+        &self.0
     }
 }
 
@@ -22,13 +20,13 @@ impl TryFrom<String> for UserId {
     type Error = Error;
     fn try_from(value: String) -> Result<Self, self::Error> {
         let v = value.graphemes(true).count();
-        if v < 6 || v > 20 {
+        if !(6..=20).contains(&v) {
             return Err(anyhow!("UserId length must be between 6 to 20."));
         };
         if !WORD.is_match(&value) {
             return Err(anyhow!("UserId must be [0-9A-Za-z]"));
         };
-        Ok(UserId { value })
+        Ok(UserId(value))
     }
 }
 
