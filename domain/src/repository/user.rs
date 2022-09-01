@@ -1,14 +1,14 @@
 use anyhow::Result;
 use async_trait::async_trait;
 
-use crate::domain::{user::User, user_id::UserId};
+use crate::model::{user::User, user_id::UserId};
 
 #[async_trait]
-pub trait ReadUser {
-    async fn get(&self) -> Result<User>;
+pub trait ReadUser<T> {
+    async fn get(&self, require: T) -> Result<User>;
 }
 
 #[async_trait]
-pub trait WriteUser {
-    async fn register(&self) -> Result<UserId>;
+pub trait WriteUser<T> {
+    async fn register(&self, model: T) -> Result<UserId>;
 }

@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 
-use crate::domain::user_id::UserId;
+use crate::model::user_id::UserId;
 
 #[derive(Debug, Clone)]
 pub struct User {
@@ -34,7 +34,7 @@ impl User {
 }
 
 pub struct UserBuilder {
-    user_id: Option<UserId>,
+    user_id: Option<String>,
     name: Option<String>,
     bio: Option<String>,
     follower: i64,
@@ -51,7 +51,7 @@ impl UserBuilder {
             followee: 0,
         }
     }
-    pub fn user_id(mut self, v: UserId) -> Self {
+    pub fn user_id(mut self, v: String) -> Self {
         self.user_id = Some(v);
         self
     }
@@ -78,7 +78,7 @@ impl UserBuilder {
 
     pub fn build(&self) -> Result<User> {
         let user_id = match &self.user_id {
-            Some(v) => v.clone(),
+            Some(v) => UserId::try_from(v.clone())?,
             None => return Err(anyhow!("NotFound user_id.")),
         };
         let name = match &self.name {
@@ -109,7 +109,7 @@ mod tests {
             // Correct
             let result = UserBuilder::default()
                 .name("taro".to_string())
-                .user_id(UserId::try_from("taro0123".to_string()).unwrap())
+                .user_id("taro0123".to_string())
                 .bio("Hello!".to_string())
                 .follower(10)
                 .followee(20)
@@ -126,7 +126,7 @@ mod tests {
             // Correct
             let result = UserBuilder::default()
                 .name("taro".to_string())
-                .user_id(UserId::try_from("taro0123".to_string()).unwrap())
+                .user_id("taro0123".to_string())
                 .build();
             assert!(result.is_ok());
             let user = result.unwrap();

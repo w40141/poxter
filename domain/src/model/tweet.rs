@@ -3,7 +3,7 @@ use chrono::prelude::*;
 use ulid::Ulid;
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::domain::user_id::UserId;
+use crate::model::user_id::UserId;
 
 #[derive(Debug, Clone)]
 pub struct Tweet {
@@ -14,8 +14,8 @@ pub struct Tweet {
 }
 
 impl Tweet {
-    pub fn id(&self) -> Ulid {
-        self.id
+    pub fn id(&self) -> &Ulid {
+        &self.id
     }
 
     pub fn user_id(&self) -> &String {
@@ -34,8 +34,8 @@ impl Tweet {
 #[derive(Debug, Clone)]
 pub struct TweetBuilder {
     id: Ulid,
-    user_id: Option<UserId>,
-    content: Option<Content>,
+    user_id: Option<String>,
+    content: Option<String>,
     created_date: DateTime<Local>,
 }
 
@@ -49,24 +49,24 @@ impl TweetBuilder {
         }
     }
 
-    pub fn user_id(mut self, v: UserId) -> Self {
+    pub fn user_id(mut self, v: String) -> Self {
         self.user_id = Some(v);
         self
     }
 
-    pub fn content(mut self, v: Content) -> Self {
+    pub fn content(mut self, v: String) -> Self {
         self.content = Some(v);
         self
     }
 
     pub fn build(&self) -> Result<Tweet> {
         let user_id = match &self.user_id {
-            Some(v) => v.clone(),
+            Some(v) => UserId::try_from(v.clone())?,
             None => return Err(anyhow!("NotFound user_id.")),
         };
 
         let content = match &self.content {
-            Some(v) => v.clone(),
+            Some(v) => Content::try_from(v.clone())?,
             None => return Err(anyhow!("NotFound content.")),
         };
 
@@ -136,14 +136,14 @@ mod tests {
     fn tweet_test() {
         {
             let result = TweetBuilder::default()
-                .user_id(UserId::try_from("taro1010".to_string()).unwrap())
-                .content(Content::try_from("Hello.".to_string()).unwrap())
+                .user_id("taro1010".to_string())
+                .content("Hello.".to_string())
                 .build();
             assert!(result.is_ok());
         }
         {
             let result = TweetBuilder::default()
-                .user_id(UserId::try_from("taro1010".to_string()).unwrap())
+                .user_id("taro1010".to_string())
                 .build();
             assert!(result.is_err());
         }

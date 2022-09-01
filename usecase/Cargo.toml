@@ -10,3 +10,4 @@ domain = { path = "../domain" }
 derive_builder = "0.11.2"
 anyhow = "1.0.58"
 async-trait = "0.1.56"
+ulid = "1.0.0"
