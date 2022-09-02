@@ -13,6 +13,6 @@ pub trait ReadTweet<T> {
 
 #[async_trait]
 pub trait WriteTweet {
-    async fn post(&self, tweet: Tweet) -> Result<Ulid>;
-    async fn reply(&self, reply_tweet: ReplyTweetRelation) -> Result<Ulid>;
+    async fn post(&self, model: Tweet) -> Result<Ulid>;
+    async fn reply(&self, model: ReplyTweetRelation) -> Result<Ulid>;
 }
