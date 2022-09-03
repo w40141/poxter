@@ -12,22 +12,14 @@ impl PostedTweet {
     pub fn new(user_id: String, tweet: String) -> Self {
         Self { user_id, tweet }
     }
-
-    pub fn user_id(&self) -> &String {
-        &self.user_id
-    }
-
-    pub fn tweet(&self) -> &String {
-        &self.tweet
-    }
 }
 
 impl TryFrom<&PostedTweet> for Tweet {
     type Error = Error;
     fn try_from(v: &PostedTweet) -> Result<Self, self::Error> {
         TweetBuilder::default()
-            .user_id(v.user_id().clone())
-            .content(v.tweet().clone())
+            .user_id(v.user_id.clone())
+            .content(v.tweet.clone())
             .build()
     }
 }

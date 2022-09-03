@@ -4,7 +4,9 @@ use async_trait::async_trait;
 use crate::handler::FetchTweet;
 use crate::model::tweet::Tweet;
 
-pub struct FetchTweetUseCase {}
+pub struct FetchTweetUseCase {
+    read_tweet: Box<dyn ReadTweet<UserId> + Sync + Send>,
+}
 
 #[async_trait]
 impl FetchTweet for FetchTweetUseCase {

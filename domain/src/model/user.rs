@@ -1,106 +1,95 @@
 use anyhow::{anyhow, Result};
+use chrono::prelude::*;
 
-use crate::model::user_id::UserId;
+use super::user_id::UserId;
+use super::user_name::UserName;
 
 #[derive(Debug, Clone)]
 pub struct User {
-    user_id: UserId,
-    name: String,
-    bio: Option<String>,
-    follower: i64,
-    followee: i64,
+    id: UserId,
+    user_name: UserName,
+    follower: Vec<UserId>,
+    followee: Vec<UserId>,
+    created_date: DateTime<Local>,
 }
 
 impl User {
-    pub fn user_id(&self) -> &String {
-        self.user_id.get()
+    pub fn id(&self) -> &UserId {
+        &self.id
     }
 
-    pub fn name(&self) -> &String {
-        &self.name
+    pub fn user_name(&self) -> &UserName {
+        &self.user_name
     }
 
-    pub fn bio(&self) -> &Option<String> {
-        &self.bio
-    }
-
-    pub fn follower(&self) -> &i64 {
+    pub fn follower(&self) -> &Vec<UserId> {
         &self.follower
     }
 
-    pub fn followee(&self) -> &i64 {
+    pub fn followee(&self) -> &Vec<UserId> {
         &self.followee
+    }
+
+    pub fn created_date(&self) -> &DateTime<Local> {
+        &self.created_date
     }
 }
 
 pub struct UserBuilder {
-    user_id: Option<String>,
-    name: Option<String>,
-    bio: Option<String>,
-    follower: i64,
-    followee: i64,
+    id: UserId,
+    user_name: Option<String>,
+    follower: Vec<UserId>,
+    followee: Vec<UserId>,
+    created_date: DateTime<Local>,
 }
 
 impl UserBuilder {
     pub fn default() -> Self {
         Self {
-            user_id: None,
-            name: None,
-            bio: None,
-            follower: 0,
-            followee: 0,
+            id: UserId::new(),
+            user_name: None,
+            follower: Vec::new(),
+            followee: Vec::new(),
+            created_date: Local::now(),
         }
     }
-    pub fn user_id(mut self, v: String) -> Self {
-        self.user_id = Some(v);
+    pub fn user_name(mut self, v: String) -> Self {
+        self.user_name = Some(v);
         self
     }
 
-    pub fn name(mut self, v: String) -> Self {
-        self.name = Some(v);
-        self
-    }
-
-    pub fn bio(mut self, v: String) -> Self {
-        self.bio = Some(v);
-        self
-    }
-
-    pub fn follower(mut self, v: i64) -> Self {
+    pub fn follower(mut self, v: Vec<UserId>) -> Self {
         self.follower = v;
         self
     }
 
-    pub fn followee(mut self, v: i64) -> Self {
+    pub fn followee(mut self, v: Vec<UserId>) -> Self {
         self.followee = v;
         self
     }
 
     pub fn build(&self) -> Result<User> {
-        let user_id = match &self.user_id {
-            Some(v) => UserId::try_from(v.clone())?,
+        let user_name = match &self.user_name {
+            Some(v) => UserName::try_from(v.clone())?,
             None => return Err(anyhow!("NotFound user_id.")),
         };
-        let name = match &self.name {
-            Some(v) => v.clone(),
-            None => return Err(anyhow!("NotFound name.")),
-        };
-        let bio = self.bio.clone();
-        let follower = self.follower;
-        let followee = self.followee;
+        let follower = self.follower.clone();
+        let followee = self.followee.clone();
 
         Ok(User {
-            user_id,
-            name,
-            bio,
+            id: self.id.clone(),
+            user_name,
             follower,
             followee,
+            created_date: self.created_date,
         })
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::vec;
+
     use super::*;
 
     #[test]
@@ -108,37 +97,28 @@ mod tests {
         {
             // Correct
             let result = UserBuilder::default()
-                .name("taro".to_string())
-                .user_id("taro0123".to_string())
-                .bio("Hello!".to_string())
-                .follower(10)
-                .followee(20)
+                .user_name("taro0123".to_string())
                 .build();
             assert!(result.is_ok());
             let user = result.unwrap();
-            assert_eq!(user.name(), "taro");
-            assert_eq!(user.user_id(), &"taro0123");
-            assert_eq!(user.bio(), &Some("Hello!".to_string()));
-            assert_eq!(user.follower(), &10);
-            assert_eq!(user.followee(), &20);
+            assert!(user.follower().is_empty());
+            assert!(user.followee().is_empty());
         }
         {
             // Correct
             let result = UserBuilder::default()
-                .name("taro".to_string())
-                .user_id("taro0123".to_string())
+                .user_name("taro0123".to_string())
+                .follower(vec![UserId::new(), UserId::new()])
+                .followee(vec![UserId::new(), UserId::new(), UserId::new()])
                 .build();
             assert!(result.is_ok());
             let user = result.unwrap();
-            assert_eq!(user.name(), "taro");
-            assert_eq!(user.user_id(), &"taro0123");
-            assert_eq!(user.bio(), &None);
-            assert_eq!(user.follower(), &0);
-            assert_eq!(user.followee(), &0);
+            assert_eq!(user.follower().len(), 2);
+            assert_eq!(user.followee().len(), 3);
         }
         {
-            // Incorrect because user id is invalid.
-            let result = UserBuilder::default().name("taro".to_string()).build();
+            // Incorrect
+            let result = UserBuilder::default().build();
             assert!(result.is_err());
         }
     }

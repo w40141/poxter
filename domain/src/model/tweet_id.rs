@@ -1,9 +1,9 @@
 use super::id::Id;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub struct UserId(Id);
+pub struct TweetId(Id);
 
-impl UserId {
+impl TweetId {
     pub fn new() -> Self {
         Self(Id::new())
     }
