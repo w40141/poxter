@@ -1,6 +1,7 @@
 pub mod bio;
 mod content;
 mod id;
+mod profile_name;
 pub mod reply_tweet;
 pub mod tweet;
 mod tweet_id;
