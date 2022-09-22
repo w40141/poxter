@@ -8,7 +8,7 @@ impl Id {
         Self(Ulid::new())
     }
 
-    pub fn id(&self) -> &Ulid {
+    pub fn get(&self) -> &Ulid {
         &self.0
     }
 }

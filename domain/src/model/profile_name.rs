@@ -5,7 +5,7 @@ use unicode_segmentation::UnicodeSegmentation;
 pub struct ProfileName(String);
 
 impl ProfileName {
-    pub fn name(&self) -> &String {
+    pub fn get(&self) -> &String {
         &self.0
     }
 }

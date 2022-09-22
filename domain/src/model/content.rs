@@ -5,7 +5,7 @@ use unicode_segmentation::UnicodeSegmentation;
 pub struct Content(String);
 
 impl Content {
-    pub fn content(&self) -> &String {
+    pub fn get(&self) -> &String {
         &self.0
     }
 }

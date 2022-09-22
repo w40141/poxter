@@ -8,7 +8,7 @@ use unicode_segmentation::UnicodeSegmentation;
 pub struct UserName(String);
 
 impl UserName {
-    pub fn name(&self) -> &String {
+    pub fn get(&self) -> &String {
         &self.0
     }
 }

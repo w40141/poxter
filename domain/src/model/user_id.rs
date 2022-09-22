@@ -10,7 +10,7 @@ impl UserId {
         Self(Id::new())
     }
 
-    pub fn user_id(&self) -> &Id {
+    pub fn get(&self) -> &Id {
         &self.0
     }
 }

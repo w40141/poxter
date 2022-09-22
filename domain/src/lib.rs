@@ -27,5 +27,5 @@ pub trait ReadUser<T> {
 
 #[async_trait]
 pub trait WriteUser {
-    async fn register(&self, model: User) -> Result<Ulid>;
+    async fn create(&self, model: User) -> Result<Ulid>;
 }

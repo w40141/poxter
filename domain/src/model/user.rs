@@ -143,31 +143,23 @@ impl UserBuilder {
         self
     }
 
-    pub fn build(&self) -> Result<User> {
-        let id = match &self.id {
-            Some(v) => UserId::from(v.clone()),
+    pub fn build(self) -> Result<User> {
+        let id = match self.id {
+            Some(v) => UserId::from(v),
             None => return Err(anyhow!("NotFound id.")),
         };
 
-        let user_name = match &self.user_name {
-            Some(v) => UserName::try_from(v.clone())?,
+        let user_name = match self.user_name {
+            Some(v) => UserName::try_from(v)?,
             None => return Err(anyhow!("NotFound user name.")),
         };
 
-        let follower = self
-            .follower
-            .iter()
-            .map(|v| UserId::from(v.clone()))
-            .collect();
+        let follower = self.follower.iter().map(|v| UserId::from(*v)).collect();
 
-        let followee = self
-            .followee
-            .iter()
-            .map(|v| UserId::from(v.clone()))
-            .collect();
+        let followee = self.followee.iter().map(|v| UserId::from(*v)).collect();
 
-        let bio = match &self.bio {
-            Some(v) => v.clone(),
+        let bio = match self.bio {
+            Some(v) => v,
             None => return Err(anyhow!("NotFound bio.")),
         };
 

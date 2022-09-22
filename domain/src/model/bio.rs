@@ -14,11 +14,11 @@ pub struct Bio {
 
 impl Bio {
     pub fn profile_name(&self) -> &String {
-        &self.profile_name.name()
+        self.profile_name.get()
     }
 
     pub fn content(&self) -> &String {
-        self.content.content()
+        self.content.get()
     }
 
     pub fn created_date(&self) -> &DateTime<Local> {
@@ -67,14 +67,14 @@ impl BioBuilder {
         self
     }
 
-    pub fn build(&self) -> Result<Bio> {
-        let profile_name = match &self.profile_name {
-            Some(v) => ProfileName::try_from(v.clone())?,
+    pub fn build(self) -> Result<Bio> {
+        let profile_name = match self.profile_name {
+            Some(v) => ProfileName::try_from(v)?,
             None => return Err(anyhow!("NotFound user_id.")),
         };
 
-        let content = match &self.content {
-            Some(v) => Content::try_from(v.clone())?,
+        let content = match self.content {
+            Some(v) => Content::try_from(v)?,
             None => return Err(anyhow!("NotFound user_id.")),
         };
 

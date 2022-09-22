@@ -35,7 +35,7 @@ impl Tweet {
     }
 
     pub fn content(&self) -> &String {
-        self.content.content()
+        self.content.get()
     }
 
     pub fn created_date(&self) -> &DateTime<Local> {
@@ -99,19 +99,19 @@ impl TweetBuilder {
         self
     }
 
-    pub fn build(&self) -> Result<Tweet> {
-        let id = match &self.id {
-            Some(v) => TweetId::from(v.clone()),
+    pub fn build(self) -> Result<Tweet> {
+        let id = match self.id {
+            Some(v) => TweetId::from(v),
             None => return Err(anyhow!("NotFound id.")),
         };
 
-        let user_id = match &self.user_id {
-            Some(v) => UserId::from(v.clone()),
+        let user_id = match self.user_id {
+            Some(v) => UserId::from(v),
             None => return Err(anyhow!("NotFound user_id.")),
         };
 
-        let content = match &self.content {
-            Some(v) => Content::try_from(v.clone())?,
+        let content = match self.content {
+            Some(v) => Content::try_from(v)?,
             None => return Err(anyhow!("NotFound user_id.")),
         };
 
