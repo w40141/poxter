@@ -2,8 +2,14 @@ use ulid::Ulid;
 
 use super::id::Id;
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
 pub struct TweetId(Id);
+
+impl Default for TweetId {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl TweetId {
     pub fn new() -> Self {

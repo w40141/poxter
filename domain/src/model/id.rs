@@ -3,6 +3,12 @@ use ulid::Ulid;
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq)]
 pub struct Id(Ulid);
 
+impl Default for Id {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Id {
     pub fn new() -> Self {
         Self(Ulid::new())

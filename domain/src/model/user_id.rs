@@ -2,8 +2,14 @@ use ulid::Ulid;
 
 use super::id::Id;
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
 pub struct UserId(Id);
+
+impl Default for UserId {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl UserId {
     pub fn new() -> Self {

@@ -246,7 +246,7 @@ mod tests {
         let old_user = User::new(user_name.clone(), vec![], vec![], bio.clone());
         let ten_millis = time::Duration::from_millis(10);
         thread::sleep(ten_millis);
-        let new_user = User::new(user_name.clone(), vec![], vec![], bio.clone());
+        let new_user = User::new(user_name, vec![], vec![], bio.clone());
         assert!(old_user < new_user);
     }
 }

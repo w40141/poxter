@@ -3,7 +3,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use unicode_segmentation::UnicodeSegmentation;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 // min: 6, max: 20 word: [0-9A-Za-z_]
 pub struct UserName(String);
 
@@ -42,7 +42,7 @@ mod tests {
             let result = UserName::try_from(n.clone());
             assert!(result.is_ok());
             let user_id = result.unwrap();
-            assert_eq!(user_id, UserName(n.clone()));
+            assert_eq!(user_id, UserName(n));
         }
         // Correct
         {
@@ -50,7 +50,7 @@ mod tests {
             let result = UserName::try_from(n.clone());
             assert!(result.is_ok());
             let user_id = result.unwrap();
-            assert_eq!(user_id, UserName(n.clone()));
+            assert_eq!(user_id, UserName(n));
         }
         // Incorrect because value is less than 5 characters.
         {

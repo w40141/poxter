@@ -144,8 +144,8 @@ mod tests {
         {
             // Correct
             let result = TweetBuilder::default()
-                .id(id.clone())
-                .user_id(user_id.clone())
+                .id(id)
+                .user_id(user_id)
                 .content(content.clone())
                 .build();
             assert!(result.is_ok());
@@ -153,7 +153,7 @@ mod tests {
         {
             // Incorrect
             let result = TweetBuilder::default()
-                .user_id(user_id.clone())
+                .user_id(user_id)
                 .content(content.clone())
                 .build();
             assert!(result.is_err());
@@ -161,16 +161,16 @@ mod tests {
         {
             // Incorrect
             let result = TweetBuilder::default()
-                .id(id.clone())
-                .content(content.clone())
+                .id(id)
+                .content(content)
                 .build();
             assert!(result.is_err());
         }
         {
             // Incorrect
             let result = TweetBuilder::default()
-                .id(id.clone())
-                .user_id(user_id.clone())
+                .id(id)
+                .user_id(user_id)
                 .build();
             assert!(result.is_err());
         }
@@ -183,7 +183,7 @@ mod tests {
 
         let old_tweet = TweetBuilder::default()
             .id(Ulid::new())
-            .user_id(user_id.clone())
+            .user_id(user_id)
             .content(content.clone())
             .build()
             .unwrap();
@@ -191,8 +191,8 @@ mod tests {
         thread::sleep(ten_millis);
         let new_tweet = TweetBuilder::default()
             .id(Ulid::new())
-            .user_id(user_id.clone())
-            .content(content.clone())
+            .user_id(user_id)
+            .content(content)
             .build()
             .unwrap();
         assert!(old_tweet < new_tweet);
