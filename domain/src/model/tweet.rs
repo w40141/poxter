@@ -12,15 +12,17 @@ pub struct Tweet {
     tweet_id: TweetId,
     user_id: UserId,
     content: Content,
+    reply_tweet_id: Option<TweetId>,
     created_date: DateTime<Local>,
 }
 
 impl Tweet {
-    pub fn new(user_id: UserId, content: Content) -> Self {
+    pub fn new(user_id: UserId, content: Content, reply_tweet_id: Option<TweetId>) -> Self {
         Self {
             tweet_id: TweetId::new(),
             user_id,
             content,
+            reply_tweet_id,
             created_date: Local::now(),
         }
     }
@@ -35,6 +37,10 @@ impl Tweet {
 
     pub fn content(&self) -> &String {
         self.content.get()
+    }
+
+    pub fn reply_tweet_id(&self) -> &Option<TweetId> {
+        &self.reply_tweet_id
     }
 
     pub fn created_date(&self) -> &DateTime<Local> {
@@ -65,6 +71,7 @@ pub struct TweetBuilder {
     tweet_id: Option<TweetId>,
     user_id: Option<UserId>,
     content: Option<String>,
+    reply_tweet_id: Option<Option<TweetId>>,
     created_date: Option<DateTime<Local>>,
 }
 
@@ -74,6 +81,7 @@ impl TweetBuilder {
             tweet_id: None,
             user_id: None,
             content: None,
+            reply_tweet_id: None,
             created_date: None,
         }
     }
@@ -90,6 +98,11 @@ impl TweetBuilder {
 
     pub fn content(mut self, v: String) -> Self {
         self.content = Some(v);
+        self
+    }
+
+    pub fn reply_tweet_id(mut self, v: Option<TweetId>) -> Self {
+        self.reply_tweet_id = Some(v);
         self
     }
 
@@ -114,6 +127,11 @@ impl TweetBuilder {
             None => return Err(anyhow!("NotFound user_id.")),
         };
 
+        let reply_tweet_id = match self.reply_tweet_id {
+            Some(v) => v,
+            None => None,
+        };
+
         let created_date = match self.created_date {
             Some(v) => v,
             None => Local::now(),
@@ -123,6 +141,7 @@ impl TweetBuilder {
             tweet_id,
             user_id,
             content,
+            reply_tweet_id,
             created_date,
         })
     }
