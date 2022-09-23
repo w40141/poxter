@@ -2,7 +2,6 @@ use std::cmp::Ordering;
 
 use anyhow::{anyhow, Result};
 use chrono::prelude::*;
-use ulid::Ulid;
 
 use super::content::Content;
 use super::tweet_id::TweetId;
@@ -10,7 +9,7 @@ use super::user_id::UserId;
 
 #[derive(Debug, Clone)]
 pub struct Tweet {
-    id: TweetId,
+    tweet_id: TweetId,
     user_id: UserId,
     content: Content,
     created_date: DateTime<Local>,
@@ -19,15 +18,15 @@ pub struct Tweet {
 impl Tweet {
     pub fn new(user_id: UserId, content: Content) -> Self {
         Self {
-            id: TweetId::new(),
+            tweet_id: TweetId::new(),
             user_id,
             content,
             created_date: Local::now(),
         }
     }
 
-    pub fn id(&self) -> &TweetId {
-        &self.id
+    pub fn tweet_id(&self) -> &TweetId {
+        &self.tweet_id
     }
 
     pub fn user_id(&self) -> &UserId {
@@ -45,9 +44,9 @@ impl Tweet {
 
 impl PartialOrd for Tweet {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        let r = if self.id > other.id {
+        let r = if self.tweet_id > other.tweet_id {
             Ordering::Greater
-        } else if self.id == other.id {
+        } else if self.tweet_id == other.tweet_id {
             Ordering::Equal
         } else {
             Ordering::Less
@@ -58,13 +57,13 @@ impl PartialOrd for Tweet {
 
 impl PartialEq for Tweet {
     fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
+        self.tweet_id == other.tweet_id
     }
 }
 
 pub struct TweetBuilder {
-    id: Option<Ulid>,
-    user_id: Option<Ulid>,
+    tweet_id: Option<TweetId>,
+    user_id: Option<UserId>,
     content: Option<String>,
     created_date: Option<DateTime<Local>>,
 }
@@ -72,19 +71,19 @@ pub struct TweetBuilder {
 impl TweetBuilder {
     pub fn default() -> Self {
         Self {
-            id: None,
+            tweet_id: None,
             user_id: None,
             content: None,
             created_date: None,
         }
     }
 
-    pub fn id(mut self, v: Ulid) -> Self {
-        self.id = Some(v);
+    pub fn tweet_id(mut self, v: TweetId) -> Self {
+        self.tweet_id = Some(v);
         self
     }
 
-    pub fn user_id(mut self, v: Ulid) -> Self {
+    pub fn user_id(mut self, v: UserId) -> Self {
         self.user_id = Some(v);
         self
     }
@@ -100,13 +99,13 @@ impl TweetBuilder {
     }
 
     pub fn build(self) -> Result<Tweet> {
-        let id = match self.id {
-            Some(v) => TweetId::from(v),
+        let tweet_id = match self.tweet_id {
+            Some(v) => v,
             None => return Err(anyhow!("NotFound id.")),
         };
 
         let user_id = match self.user_id {
-            Some(v) => UserId::from(v),
+            Some(v) => v,
             None => return Err(anyhow!("NotFound user_id.")),
         };
 
@@ -121,7 +120,7 @@ impl TweetBuilder {
         };
 
         Ok(Tweet {
-            id,
+            tweet_id,
             user_id,
             content,
             created_date,
@@ -137,15 +136,13 @@ mod tests {
 
     #[test]
     fn tweet_test() {
-        let id = Ulid::new();
-        let user_id = Ulid::new();
         let content = "abc".to_string();
 
         {
             // Correct
             let result = TweetBuilder::default()
-                .id(id)
-                .user_id(user_id)
+                .tweet_id(TweetId::new())
+                .user_id(UserId::new())
                 .content(content.clone())
                 .build();
             assert!(result.is_ok());
@@ -153,7 +150,7 @@ mod tests {
         {
             // Incorrect
             let result = TweetBuilder::default()
-                .user_id(user_id)
+                .user_id(UserId::new())
                 .content(content.clone())
                 .build();
             assert!(result.is_err());
@@ -161,7 +158,7 @@ mod tests {
         {
             // Incorrect
             let result = TweetBuilder::default()
-                .id(id)
+                .tweet_id(TweetId::new())
                 .content(content)
                 .build();
             assert!(result.is_err());
@@ -169,8 +166,8 @@ mod tests {
         {
             // Incorrect
             let result = TweetBuilder::default()
-                .id(id)
-                .user_id(user_id)
+                .tweet_id(TweetId::new())
+                .user_id(UserId::new())
                 .build();
             assert!(result.is_err());
         }
@@ -178,20 +175,19 @@ mod tests {
 
     #[test]
     fn tweet_order_test() {
-        let user_id = Ulid::new();
         let content = "abc".to_string();
 
         let old_tweet = TweetBuilder::default()
-            .id(Ulid::new())
-            .user_id(user_id)
+            .tweet_id(TweetId::new())
+            .user_id(UserId::new())
             .content(content.clone())
             .build()
             .unwrap();
         let ten_millis = time::Duration::from_millis(10);
         thread::sleep(ten_millis);
         let new_tweet = TweetBuilder::default()
-            .id(Ulid::new())
-            .user_id(user_id)
+            .tweet_id(TweetId::new())
+            .user_id(UserId::new())
             .content(content)
             .build()
             .unwrap();

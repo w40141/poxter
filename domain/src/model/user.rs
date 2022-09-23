@@ -2,7 +2,6 @@ use std::cmp::Ordering;
 
 use anyhow::{anyhow, Result};
 use chrono::prelude::*;
-use ulid::Ulid;
 
 use super::bio::Bio;
 use super::user_id::UserId;
@@ -10,7 +9,7 @@ use super::user_name::UserName;
 
 #[derive(Debug, Clone)]
 pub struct User {
-    id: UserId,
+    user_id: UserId,
     user_name: UserName,
     follower: Vec<UserId>,
     followee: Vec<UserId>,
@@ -20,25 +19,20 @@ pub struct User {
 }
 
 impl User {
-    pub fn new(
-        user_name: UserName,
-        follower: Vec<UserId>,
-        followee: Vec<UserId>,
-        bio: Bio,
-    ) -> Self {
+    pub fn new(user_name: UserName, bio: Bio) -> Self {
         Self {
-            id: UserId::new(),
+            user_id: UserId::new(),
             user_name,
-            follower,
-            followee,
+            follower: vec![],
+            followee: vec![],
             bio,
             created_date: Local::now(),
             updated_date: Local::now(),
         }
     }
 
-    pub fn id(&self) -> &UserId {
-        &self.id
+    pub fn user_id(&self) -> &UserId {
+        &self.user_id
     }
 
     pub fn user_name(&self) -> &UserName {
@@ -68,9 +62,9 @@ impl User {
 
 impl PartialOrd for User {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        let r = if self.id > other.id {
+        let r = if self.user_id > other.user_id {
             Ordering::Greater
-        } else if self.id == other.id {
+        } else if self.user_id == other.user_id {
             Ordering::Equal
         } else {
             Ordering::Less
@@ -81,15 +75,15 @@ impl PartialOrd for User {
 
 impl PartialEq for User {
     fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
+        self.user_id == other.user_id
     }
 }
 
 pub struct UserBuilder {
-    id: Option<Ulid>,
+    user_id: Option<UserId>,
     user_name: Option<String>,
-    follower: Vec<Ulid>,
-    followee: Vec<Ulid>,
+    follower: Vec<UserId>,
+    followee: Vec<UserId>,
     bio: Option<Bio>,
     created_date: Option<DateTime<Local>>,
     updated_date: Option<DateTime<Local>>,
@@ -98,18 +92,18 @@ pub struct UserBuilder {
 impl UserBuilder {
     pub fn default() -> Self {
         Self {
-            id: None,
+            user_id: None,
             user_name: None,
-            follower: Vec::new(),
-            followee: Vec::new(),
+            follower: vec![],
+            followee: vec![],
             bio: None,
             created_date: None,
             updated_date: None,
         }
     }
 
-    pub fn id(mut self, v: Ulid) -> Self {
-        self.id = Some(v);
+    pub fn user_id(mut self, v: UserId) -> Self {
+        self.user_id = Some(v);
         self
     }
 
@@ -118,12 +112,12 @@ impl UserBuilder {
         self
     }
 
-    pub fn follower(mut self, v: Vec<Ulid>) -> Self {
+    pub fn follower(mut self, v: Vec<UserId>) -> Self {
         self.follower = v;
         self
     }
 
-    pub fn followee(mut self, v: Vec<Ulid>) -> Self {
+    pub fn followee(mut self, v: Vec<UserId>) -> Self {
         self.followee = v;
         self
     }
@@ -144,19 +138,15 @@ impl UserBuilder {
     }
 
     pub fn build(self) -> Result<User> {
-        let id = match self.id {
-            Some(v) => UserId::from(v),
-            None => return Err(anyhow!("NotFound id.")),
+        let user_id = match self.user_id {
+            Some(v) => v,
+            None => UserId::new(),
         };
 
         let user_name = match self.user_name {
             Some(v) => UserName::try_from(v)?,
             None => return Err(anyhow!("NotFound user name.")),
         };
-
-        let follower = self.follower.iter().map(|v| UserId::from(*v)).collect();
-
-        let followee = self.followee.iter().map(|v| UserId::from(*v)).collect();
 
         let bio = match self.bio {
             Some(v) => v,
@@ -174,10 +164,10 @@ impl UserBuilder {
         };
 
         Ok(User {
-            id,
+            user_id,
             user_name,
-            follower,
-            followee,
+            follower: self.follower,
+            followee: self.followee,
             bio,
             created_date,
             updated_date,
@@ -187,7 +177,6 @@ impl UserBuilder {
 
 #[cfg(test)]
 mod tests {
-    use std::vec;
     use std::{thread, time};
 
     use super::super::bio::BioBuilder;
@@ -204,7 +193,6 @@ mod tests {
         {
             // Correct
             let result = UserBuilder::default()
-                .id(Ulid::new())
                 .user_name("taro0123".to_string())
                 .bio(bio.clone())
                 .build();
@@ -216,11 +204,10 @@ mod tests {
         {
             // Correct
             let result = UserBuilder::default()
-                .id(Ulid::new())
                 .user_name("taro0123".to_string())
                 .bio(bio.clone())
-                .follower(vec![Ulid::new(), Ulid::new()])
-                .followee(vec![Ulid::new(), Ulid::new(), Ulid::new()])
+                .follower((0..2).map(|_| UserId::new()).collect())
+                .followee((0..3).map(|_| UserId::new()).collect())
                 .build();
             assert!(result.is_ok());
             let user = result.unwrap();
@@ -243,10 +230,10 @@ mod tests {
             .unwrap();
         let user_name = UserName::try_from("taro0123".to_string()).unwrap();
 
-        let old_user = User::new(user_name.clone(), vec![], vec![], bio.clone());
+        let old_user = User::new(user_name.clone(), bio.clone());
         let ten_millis = time::Duration::from_millis(10);
         thread::sleep(ten_millis);
-        let new_user = User::new(user_name, vec![], vec![], bio.clone());
+        let new_user = User::new(user_name, bio.clone());
         assert!(old_user < new_user);
     }
 }
